@@ -1,0 +1,14 @@
+services:
+  bot:
+    image: imt/InfinityMint-frontend:latest
+    container_name: InfinityMint-frontend
+    build:
+      context: ../
+      dockerfile: ./docker/dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../.env
+    environment:
+      - PORT=3000
+    restart: unless-stopped

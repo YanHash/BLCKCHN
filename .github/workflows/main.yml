@@ -1,0 +1,34 @@
+name: Deploy InfinityMint marketplace frontend
+
+on: []
+#   push:
+#     branches: ["main"]
+#     paths:
+#       - 'InfinityMint-frontend/**'  # Déclenche seulement si des fichiers dans ce dossier sont modifiés
+#   pull_request:
+#     branches: ["main"]
+#     paths:
+#       - 'InfinityMint-frontend/**'  # Déclenche seulement si une PR modifie ces fichiers
+
+jobs:
+  nodejs_build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["20"]
+    steps:
+      - name: Install SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: Extract repo name
+        id: repo_name
+        run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f 2)" >> $GITHUB_ENV
+
+      - name: Connect and Pull
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && NODE_ENV=production sudo docker compose -p ${{ env.REPO_NAME }} -f docker/docker-compose.yaml up --build -d && exit"
+
+      - name: Cleanup
+        run: rm -rf ~/.ssh

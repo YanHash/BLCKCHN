@@ -1,3 +1,2 @@
 # BLCKCHN
-Decentralized social network
-Jules le kiffeur
+Les nft c'est bien

@@ -1,2 +1,2 @@
 # BLCKCHN
-Decentralized social network
+Projet de marketplace décentralisée

@@ -1,1 +1,2 @@
 # BLCKCHN
+Decentralized social network

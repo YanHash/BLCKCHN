@@ -1,13 +1,18 @@
 const { ethers } = require("ethers");
+const Database = require("../config/database"); 
 require("dotenv").config();
 
 
+let provider;
+let signer;
+
+
 class NFT {
+
     constructor(chain, contractAddress, tokenID) {
         this._contractAddress = contractAddress;
         this._tokenID = tokenID;
         this._chain = chain;
-        this._walletAddress = process.env.WALLET_ADD;
 
         this._name = null;
         this._NFTContract = null;
@@ -17,23 +22,32 @@ class NFT {
         this._content = null;
         this._collection = null;
         this._price = null;
-
-        this._provider = null;
-        this._signer = null;
     }
 
     getNFT() {
-        return JSON.stringify(this, null, 2);
+        return {
+            chain: this._chain,
+            contractAddress: this._contractAddress,
+            tokenID: this._tokenID,
+
+            name: this._name,
+            contract : this._NFTContract,
+            NFTId: this._NFTId,
+            creator: this._creator,
+            holder: this._holder,
+            content: this._content,
+            collection: this._collection,
+            price: this._price,
+        };
     }
 
     async initializeMetamask() {
         if (typeof window.ethereum !== "undefined") {
             try {
                 await window.ethereum.request({ method: "eth_requestAccounts" }); 
-                this._provider = new ethers.BrowserProvider(window.ethereum);
-                this._signer = await this._provider.getSigner();
-                this._walletAddress = await this._signer.getAddress();
-                console.log("Connexion réussie avec Metamask :", this._walletAddress);
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                console.log("Connexion réussie avec Metamask :", process.env.WALLET_ADD);
             } catch (error) {
                 console.error("Erreur lors de la connexion à Metamask :", error);
             }
@@ -44,7 +58,7 @@ class NFT {
 
     async requestBlockChain() {
         try {
-            if (!this._provider) {
+            if (!provider) {
                 console.error("Metamask n'est pas initialisé. Appelez `initializeMetamask` d'abord.");
                 return;
             }
@@ -57,7 +71,7 @@ class NFT {
                 "function priceOf(uint256 tokenId) view returns (uint256)",
             ];
 
-            const contract = new ethers.Contract(this._contractAddress, abi, this._provider);
+            const contract = new ethers.Contract(this._contractAddress, abi, provider);
 
             this._name = await contract.name();
             this._holder = await contract.ownerOf(this._tokenID);
@@ -78,7 +92,7 @@ class NFT {
 
     async mintNFT(mediaURI) {
         try {
-            if (!this._signer) {
+            if (!signer) {
                 console.error("Signer non disponible. Assurez-vous que Metamask est connecté.");
                 return;
             }
@@ -87,9 +101,9 @@ class NFT {
                 "function mint(address to, string memory tokenURI) public",
             ];
 
-            const contract = new ethers.Contract(this._contractAddress, abi, this._signer);
+            const contract = new ethers.Contract(this._contractAddress, abi, signer);
 
-            const tx = await contract.mint(this._walletAddress, mediaURI);
+            const tx = await contract.mint(process.env.WALLET_ADD, mediaURI);
             console.log("Transaction envoyée :", tx.hash);
 
             const receipt = await tx.wait();
@@ -99,6 +113,8 @@ class NFT {
         }
     }
 }
+
+
 
 /* Exemple d'utilisation
 (async () => {

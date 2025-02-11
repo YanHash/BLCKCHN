@@ -1,24 +1,20 @@
 
-const express = require('express')
-const database = require('./config/database')
-const variables = require('./core/variables')
-const { getFirestore, collection, getDocs, doc, setDoc} = require("firebase/firestore/lite");
+import express from 'express';
+import database from './config/database.js'
+import * as variables from './core/variables.js'
+import { getFirestore, collection, getDocs, doc, setDoc} from "firebase/firestore/lite";
+
+import userRoutes from './routes/user.js';
+
 
 const app = express()
 
-variables.databaseFirebase = new database()
-variables.databaseFirebase.connexionDatabase()
-  
-app.get('/', (req, res) => {
-    res.send("Hello from Express!")
-    test = {
-        name: "Frankin",
-        age: 10,
-        country: "USA"
-    }
-    variables.databaseFirebase.insertBDD("users","1",test)
+variables.firebaseState.databaseFirebase = new database()
+variables.firebaseState.databaseFirebase.connexionDatabase()
 
-})
+
+
+app.use('/users', userRoutes);
 
 app.listen(3000, () => {
     console.log('Listening on port 3000')

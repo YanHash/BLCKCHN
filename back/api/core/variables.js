@@ -1,7 +1,13 @@
-const appFirebase = null;
-const db = null;
-const firebaseConfig = null;
+export const appFirebase = null;
+export const db = null;
+export const firebaseConfig = null;
 
-const databaseFirebase = null;
+export const databaseFirebase = null;
 
 
+export const firebaseState = {
+    appFirebase: null,
+    db: null,
+    firebaseConfig: null,
+    databaseFirebase: null
+};

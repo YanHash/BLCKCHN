@@ -1,14 +1,15 @@
-const path = require('path');
-const variables = require("../core/variables")
-require('dotenv').config()
+import path from 'path';
+import * as variables from "../core/variables.js"
 
+import dotenv from "dotenv"
 
+dotenv.config()
 
-const { initializeApp } = require("firebase/app");
+import { initializeApp } from "firebase/app";
 
-const { getFirestore, collection, getDocs, doc, setDoc} = require("firebase/firestore/lite");
+import { getFirestore, collection, getDoc, doc, setDoc} from "firebase/firestore/lite";
 
-class Database {
+export default class Database {
 
     constructor(){}
 
@@ -24,19 +25,34 @@ class Database {
   
     connexionDatabase(){
         // Initialize Firebase
-        variables.firebaseConfig = this.firebaseConfig
-        variables.appFirebase = initializeApp(this.firebaseConfig);
-        variables.db  = getFirestore(variables.appFirebase);
+        variables.firebaseState.firebaseConfig = this.firebaseConfig
+        variables.firebaseState.appFirebase = initializeApp(this.firebaseConfig);
+        variables.firebaseState.db  = getFirestore(variables.firebaseState.appFirebase);
         console.log("demarrage service firebase OK");
     }
 
     insertBDD(collectionName, documentName, value){
-        setDoc(doc(variables.db, collectionName, documentName),value);
+        setDoc(doc(variables.firebaseState.db, collectionName, documentName),value);
+    }
+
+    async ReadDatabase(collectionName, documentName){
+        try {
+            const docRef = doc(variables.firebaseState.db, collectionName, documentName);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                return docSnap.data();
+            } else {
+                return null
+            }
+        }
+        catch(e){
+            // en cas d'erreur, on retourne null
+            return null
+        }
+        
     }
 
 }
 
 
 
-
-module.exports = Database;

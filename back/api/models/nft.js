@@ -10,9 +10,10 @@ let signer;
 class NFT {
 
     constructor(chain, contractAddress, tokenID) {
-        this._contractAddress = contractAddress;
-        this._tokenID = tokenID;
-        this._chain = chain;
+        this.contractAddress = contractAddress;
+        this.tokenID = tokenID;
+        this.chain = chain;
+        this.collection = null;
 
         this._name = null;
         this._NFTContract = null;
@@ -20,7 +21,6 @@ class NFT {
         this._creator = null;
         this._holder = null;
         this._content = null;
-        this._collection = null;
         this._price = null;
     }
 
@@ -113,6 +113,7 @@ class NFT {
         }
     }
 }
+
 
 
 
